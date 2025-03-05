@@ -22,7 +22,7 @@ const deliveryCharges: Record<string, number> = {
 };
 
 const CheckOutPage = () => {
-  const { getTotalPrice, getSubtotalPrice, resetCart } = useCartStore();
+  const { getTotalPrice, resetCart } = useCartStore();
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
   const router = useRouter();
 
@@ -44,9 +44,8 @@ const CheckOutPage = () => {
     e.preventDefault();
     if (!paymentMethod) return;
 
-    const subtotal = getSubtotalPrice();
     const deliveryCharge = deliveryCharges[userDetails.city] || 0;
-    const totalAmount = subtotal + deliveryCharge;
+    const totalAmount = getTotalPrice() + deliveryCharge;
 
     const emailParams = {
       name: userDetails.name,
@@ -54,7 +53,6 @@ const CheckOutPage = () => {
       phone: userDetails.phone,
       address: userDetails.address,
       city: userDetails.city,
-      subtotal,
       delivery_charges: deliveryCharge,
       payment_method: paymentMethod,
       total: totalAmount,
@@ -82,10 +80,6 @@ const CheckOutPage = () => {
           <div className="bg-white p-6 rounded-lg border">
             <h2 className="text-xl font-semibold mb-4">Checkout</h2>
             <div className="space-y-4">
-              <div className="flex justify-between">
-                <span>Subtotal</span>
-                <PriceFormatter amount={getSubtotalPrice()} />
-              </div>
               <div className="flex justify-between">
                 <span>Delivery Charges</span>
                 <PriceFormatter amount={deliveryCharges[userDetails.city] || 0} />
